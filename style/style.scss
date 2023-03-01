@@ -1,0 +1,24 @@
+@import "scss/_functions";
+@import "scss/_variables";
+$brah:    rgb(198, 30, 142);
+$black:rgb(0, 0, 0);
+$theme-colors: (
+  "primary":    $primary,
+  "secondary":  $secondary,
+  "success":    $success,
+  "info":       $info,
+  "warning":    $warning,
+  "danger":     $danger,
+  "light":      $light,
+  "dark":       $dark,
+  "black":      $black,
+  "green":      rgb(4, 137, 52), 
+  "blue":       rgb(59, 59, 211),
+  "red":        rgb(227, 97, 97),
+  "white":      rgb(255, 255, 255),
+  "yellow":     rgb(242, 189, 83),   
+  "grey": rgb(152, 152, 152)
+);
+
+@import "scss/bootstrap";
+@import "scss/_mixins";
