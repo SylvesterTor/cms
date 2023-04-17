@@ -1,8 +1,9 @@
 <?php
-include "..\secrets\connectLocal.php";
+#include "..\secrets\connectLocal.php";
+include "../secrets/connect.php";
 
 $modules = $_POST["module_ID"];
-$position=$_POST["position"]+1;
+$position=$_POST["position"];
 
 $insertBlockSql=
 'INSERT INTO blocks (content, module_ID, position) VALUES ("<p class=\'bg-green\'>new block here</p>",'.$modules.', '.$position.' )';

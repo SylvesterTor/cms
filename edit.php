@@ -4,30 +4,35 @@ $page_ID=1;
 $logInError=false;
 $loggedIn=false;
 session_start();
+#include "secrets/connectLocal.php";
+include "secrets/connect.php";
+
+include "sql_statements.php";
 
 if(isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]){
     $loggedIn=true;
+	if(isset($_SESSION["siteId"])){
+		$siteId=$_SESSION["siteId"];
+	}
+	if(isset($_GET["pageID"])){
+		$page_ID=$_GET["pageID"];
+	}
+	if(isset($_SESSION["user"])){
+		$user= $_SESSION["user"];
+	}
+	$get_page->execute();
+	$page=$get_page->get_result();
+	$page=$page->fetch_assoc();
+	if($page["site_ID"]!=$siteId){
+		$loggedIn=false;
+	}
 }else{
     $loggedIn=false;
 }
-if(isset($_SESSION["siteId"])){
-    $siteId=$_SESSION["siteId"];
-}
-if(isset($_GET["pageID"])){
-    $page_ID=$_GET["pageID"];
-}
-if(isset($_SESSION["user"])){
-	$user= $_SESSION["user"];
-}
 
-include "secrets/connectLocal.php";
-include "sql_statements.php";
 include "phpScripts/navbar.php";
 include "basicFunctions.php";
 
-$get_page->execute();
-$result=$get_page->get_result();
-$page=$result->fetch_assoc();
 ?>
 
 <!DOCTYPE html>
@@ -46,12 +51,12 @@ $page=$result->fetch_assoc();
 			header('Location: login.php');
 		
     }else{
-		
-		navbarEdit(1);
+
+		navbarEdit($page["site_ID"]);
 		?>
 
     <!-- main page-->
-    <div class="container-fluid">
+    <div class="container-fluid px-5">
 
 <?php
 $get_zones=
@@ -61,7 +66,7 @@ $zones = $conn->query($get_zones);
 //get zones
 while ($zone=$zones->fetch_assoc()) {
   $get_modules=
-  'SELECT * FROM module WHERE zone_ID = '.$zone["zone_ID"].'';
+  'SELECT * FROM module WHERE zone_ID = '.$zone["zone_ID"].' ORDER BY position ASC';
   $modules= $conn->query($get_modules);
 
   if($modules->num_rows>0){
@@ -79,7 +84,7 @@ while ($zone=$zones->fetch_assoc()) {
 	}else{
 		$shadow="";
 	}
-	echo '<div class="row module '.$shadow.'" id="module-'.$module["module_ID"].'" data-position="'.$module["position"].'" data-parent="'.$module["zone_ID"].'" style="background-color:'.$module["background"].'">';
+	echo '<div class="row m-5 '.$shadow.'" id="module-'.$module["module_ID"].'" data-position="'.$module["position"].'" data-parent="'.$module["zone_ID"].'" style="background-color:'.$module["background"].'">';
     $blocks= $conn->query($get_blocks);
 
 	if($blocks->num_rows>0){
@@ -102,7 +107,7 @@ while ($zone=$zones->fetch_assoc()) {
   		<button type="button" onClick="edit(this,1);" data-target="<?php echo $block["block_ID"]?>" id="buttonBlock-<?php echo $block["block_ID"]?>" class="position-absolute bottom-0 end-0 btn btn-outline-dark">
     	Edit
   		</button>
-  <ul class="shadow bg-light position-fixed bottom-10 end-10 d-none" id="editBlock-<?php echo $block["block_ID"]?>"style="z-index:10;">
+  <ul class="sectionEditor shadow bg-light position-fixed bottom-10 end-10 d-none" id="editBlock-<?php echo $block["block_ID"]?>"style="z-index:10;">
 	<form action="" id="editForm-<?php echo $block["block_ID"]?>" name="editForm-<?php echo $block["block_ID"]?>">
     <!-- Dropdown menu links -->
 	
@@ -114,7 +119,7 @@ while ($zone=$zones->fetch_assoc()) {
 	<li class="dropdown-item">
 		<label class="btn" >Color
 		<input type="color" name="bgColor" id="" value="<?php echo rgbaToHex($module["background"]); ?>"data-target="<?php echo $block["block_ID"]; ?>" onchange="changeColor(this,1);">
-		<input type="range" name="bgOpacity" id=""data-target="<?php echo $block["block_ID"]; ?>" onchange="changeOpacity(this,1);">
+		<input type="range" name="bgOpacity" id="" value="<?php echo getAlpha($module["background"]); ?>" data-target="<?php echo $block["block_ID"]; ?>" onchange="changeOpacity(this,1);">
 		</label>
 	</li>
 	</form>
@@ -136,12 +141,12 @@ while ($zone=$zones->fetch_assoc()) {
   <button class="btn btn-secondary" type="button" onClick="edit(this,2);" data-target="<?php echo $module["module_ID"]?>" id="buttonModule-<?php echo $module["module_ID"]?>">
 	module
 </button>
-<ul class="shadow bg-light position-fixed bottom-10 end-10 d-none" id="editModule-<?php echo $module["module_ID"]?>"style="z-index:10;">
+<ul class="sectionEditor  shadow bg-light position-fixed bottom-10 end-10 d-none" id="editModule-<?php echo $module["module_ID"]?>"style="z-index:10;">
 	<form action="" id="editModuleForm-<?php echo $module["module_ID"]?>" name="editModuleForm-<?php echo $module["module_ID"]?>">
 	<li class="dropdown-item">
 	<label class="btn" >Color
 		<input type="color" name="bgColor" id="" value="<?php echo rgbaToHex($module["background"]); ?>"data-target="<?php echo $module["module_ID"]; ?>" onchange="changeColor(this,2);">
-		<input type="range" name="bgOpacity" id=""data-target="<?php echo $module["module_ID"]; ?>" onchange="changeOpacity(this,2);">
+		<input type="range" name="bgOpacity" id="" value="<?php echo getAlpha($module["background"])*100; ?>"data-target="<?php echo $module["module_ID"]; ?>" onchange="changeOpacity(this,2);">
 	</label>
 </li>
 <li class="dropdown-item">
@@ -159,6 +164,7 @@ while ($zone=$zones->fetch_assoc()) {
 	echo "No modules in this zone. Start adding";
   	echo "</div>";
   }
+
   }
 
 ?>
@@ -177,9 +183,6 @@ while ($zone=$zones->fetch_assoc()) {
 	</li>
 	<li class="dropdown-item">
 		<a class="btn" href="admin.php">Go to admin</a>
-	</li>
-	<li class="dropdown-item">
-		<button class="btn">Add page</button>
 	</li>
   </ul>
   
@@ -205,19 +208,21 @@ while ($zone=$zones->fetch_assoc()) {
 		let editorButton="";
 		let currentEditorData="";
 		let editorReady=false;
-
+  		let previousForm="";
 		//variable to select highlighted part
   		let highlightedClass="block";
 
 		//function to editblock
         function edit(params,type) {
-
 			//show form
 			let formElement;
+			let standardText;
 			if(type==1){
 			formElement=document.getElementById("editBlock-"+params.dataset.target);
+			standardText="Module";
 			}else{
 				formElement=document.getElementById("editModule-"+params.dataset.target);
+				standardText="Block";
 			}
 			formElement.classList.remove("d-none");
 
@@ -227,24 +232,24 @@ while ($zone=$zones->fetch_assoc()) {
 			//get button
 			var button = document.getElementById(params.id);
 
-			if(editorIsset && editorButton != button){
-				editor.destroy();
-				editor="";
-				editorButton.innerHTML="text";
-				editorButton="";
-				editorIsset=false;
-				formElement.classList.add("d-none");
-				editorReady=false;
-			}
 			if(editorButton==button){
 				formElement.classList.add("d-none");
 				save(params,type);
 				editorReady=false;
 			}else{
-				button.innerHTML="save";
+				resetForm(standardText);
+				previousForm=formElement;
+				button.innerHTML="Save";
 				editorButton=button;
 			}
         }
+
+		function resetForm(text){
+			if(previousForm!=""){
+			previousForm.classList.add("d-none");
+			editorButton.innerHTML=text;
+		}
+		}
 
 		function editText(params){
 			if(editorIsset){
@@ -332,6 +337,7 @@ while ($zone=$zones->fetch_assoc()) {
 			//remove editor from block
 			editorButton.innerHTML="edit";
 			editorButton="";
+			previousForm="";
 			saveAlert("block saved");
         }
 
@@ -410,7 +416,7 @@ while ($zone=$zones->fetch_assoc()) {
 				element.addEventListener(
 			  		"mouseover",
 			  		(event) => {
-						position_before=parseInt(element.dataset.position)-1;
+						position_before=parseInt(element.dataset.position);
 						position_after=parseInt(element.dataset.position)+1;
 						parent=element.dataset.parent;
 						if(!element.classList.contains("addMode") && element.classList.contains(highlightedClass)){
@@ -508,20 +514,6 @@ while ($zone=$zones->fetch_assoc()) {
 			return document.querySelectorAll("."+elementClass);
 		}
 
-		function remove(param){
-            id = param.id;
-            target=param.dataset.target;
-            // Selecting the input element and get its value 
-           var inputVal = document.getElementById(id).value;
-           var element =  document.getElementById(param.dataset.target);
-            var value = param.checked ? true : false;
-            if(!value){
-                element.classList.add("d-none");
-            }else{
-                element.classList.remove("d-none");
-            }
-    }
-
     function movenav(param){
             var element=document.getElementById(param.dataset.target);
             if(param.value=="left"){
@@ -540,7 +532,7 @@ while ($zone=$zones->fetch_assoc()) {
 
 	function saveNavbar(event,params) {
 		var formData = new FormData(params); // get form data
-
+		event.preventDefault();
 		$.ajax({
             	url:"phpScripts/saveNav.php",    //php scritpet
             	type: "post",    //request type,
@@ -558,7 +550,20 @@ while ($zone=$zones->fetch_assoc()) {
 	function saveAlert(string){
 		alert(string);
 	}
-
+	function remove(param){
+            id = param.id;
+            target=param.dataset.target;
+            console.log(target);
+            // Selecting the input element and get its value 
+           var inputVal = document.getElementById(id).value;
+           var element =  document.getElementById(param.dataset.target);
+            var value = param.checked ? true : false;
+            if(!value){
+                element.classList.add("d-none");
+            }else{
+                element.classList.remove("d-none");
+            }
+    }
     </script>
 
 <?php

@@ -5,11 +5,17 @@ if(!isset($_GET["page_ID"])){
   header('Location: pagenotfound.php');
 }
 
-include "secrets/connectLocal.php";
+#include "secrets/connectLocal.php";
+include "secrets/connect.php";
+
 include "phpScripts/navbar.php";
 include "basicFunctions.php";
+include "sql_statements.php";
 ?>
-
+ <?php
+      $get_page->execute();
+      $page=$get_page->get_result();
+      $page=$page->fetch_assoc();?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +23,7 @@ include "basicFunctions.php";
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/style.css">
-    <title>index</title>
+    <title><?php echo $page["pageName"];?></title>
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
@@ -28,16 +34,15 @@ include "basicFunctions.php";
 
 <body>
   <?php
-  navbar(1);
+      navbar($page["site_ID"]);
   ?>
 
-  <div class="container-fluid">
+  <div class="container-fluid px-5">
 <?php
 //get zones then modules and then blocks
 $get_zones=
 'SELECT * FROM module_zone WHERE page_ID = '.$page_ID.' ORDER BY placement ASC';
 $zones = $conn->query($get_zones);
-
 while ($zone=$zones->fetch_assoc()) {
 
   $get_modules=
@@ -61,7 +66,7 @@ while ($zone=$zones->fetch_assoc()) {
         $shadow="";
       }
 	  //create module div
-      echo '<div class="row module '.$shadow.'" style="background-color:'.$module["background"].'">';
+      echo '<div class="row m-5 '.$shadow.'" style="background-color:'.$module["background"].'">';
     	while ($block=$blocks->fetch_assoc()) {
 			$shadow=""; 
 			if($block["shadow"]){
@@ -79,9 +84,9 @@ while ($zone=$zones->fetch_assoc()) {
   		echo '</div>';
 	}
   }
+
 }
 ?>
-
 
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"

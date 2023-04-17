@@ -6,7 +6,7 @@ function navbar($siteID)
   $navbarResult=$conn->query($sql);
   $navbar=$navbarResult->fetch_assoc();
 
-  $sql="SELECT * FROM navbaritems WHERE navbar_ID = ".$navbar["id"]."";
+  $sql="SELECT * FROM navbaritems INNER JOIN pages ON pages.page_ID=navbaritems.page_ID WHERE navbaritems.navbar_ID = ".$navbar["id"]."";
   $navbarItems=$conn->query($sql);
   ?>
 
@@ -23,7 +23,7 @@ function navbar($siteID)
           if ($navbarItems->num_rows > 0) {
             // output data of each row
             while($row = $navbarItems->fetch_assoc()) {
-              echo "<li class='nav-item'><a href='index.php?page_ID=".$row["link"]."' class='nav-link'>".$row['text']."</a></li>";
+              echo "<li class='nav-item'><a href='index.php?page_ID=".$row["page_ID"]."' class='nav-link'>".$row['pageName']."</a></li>";
             }
           }
           ?>
@@ -46,11 +46,22 @@ function navbar($siteID)
 
 function navbarEdit($siteID)
 {
-  global $conn;
+	global $conn;
+	if(isset($_POST["newLink"])){
+		$sql=
+		"INSERT INTO `navbaritems`(`navbar_ID`, `page_ID`) VALUES (".$_POST["id"].",".$_POST["page"].")";
+		$conn->query($sql);
+	}else{
+		if(isset($_POST["removeLink"])){
+			$sql=
+			"DELETE FROM navbaritems WHERE id = ".$_POST["linkToRemove"].";";
+			$conn->query($sql);
+		}
+	}
 $sql="SELECT * FROM navbar WHERE id = ".$siteID."";
 $result=$conn->query($sql);
 $navbar=$result->fetch_assoc();
-$sql="SELECT * FROM navbaritems WHERE navbar_ID = ".$navbar["id"]."";
+$sql="SELECT * FROM navbaritems INNER JOIN pages ON pages.page_ID=navbaritems.page_ID WHERE navbaritems.navbar_ID = ".$navbar["id"]."";
 $navbarItems=$conn->query($sql);
 
   ?>
@@ -71,18 +82,21 @@ $navbarItems=$conn->query($sql);
         if ($navbarItems->num_rows > 0) {
           // output data of each row
           while($row = $navbarItems->fetch_assoc()) {
-            echo "<li class='nav-item'><a href='index.php?page_ID=".$row["link"]."' class='nav-link'>".$row['text']."</a></li>";
-          }
+			echo "<li class='nav-item'><a href='edit.php?pageID=".$row["page_ID"]."' class='nav-link'>".$row['pageName']."</a></li>";
+		}
         }
           ?>
 
-          <li class="nav-item">
-            <button class="btn btn-outline-grey circle rounded nav-link" type="button">
+		<li class="nav-item"> 
+            <button class="btn btn-outline-grey circle rounded nav-link" type="button" data-bs-toggle="collapse" 
+			data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+		
               +
             </button>
           </li>
           <li class="nav-item">
-            <button class="btn btn-outline-danger circle rounded nav-link" type="button" >
+            <button class="btn btn-outline-danger circle rounded nav-link" type="button" data-bs-toggle="collapse" 
+			data-bs-target="#removenav" aria-expanded="false" aria-controls="removenav">
               -
             </button>
           </li>
@@ -116,17 +130,18 @@ $navbarItems=$conn->query($sql);
     </div>
     <input type="hidden" name="navbarID" value="<?php echo $navbar["id"]; ?>">
   </form>
-  <form class="collapse row" id="collapseExample" action="phpscripts\addNavLink.inc.php" method="POST">
+  <form class="collapse row" id="collapseExample" method="POST">
+	<input type="hidden" name="newLink" value="1">
     <div class="col-2">
       <select name="page" class="form-select" id="floatingSelect" aria-label="Floating label select example">
       
       <?php
-$sql = "SELECT * FROM pages WHERE site_ID = 1";
+$sql = "SELECT * FROM pages WHERE site_ID = ".$siteID."";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
   // output data of each row
   while($row = $result->fetch_assoc()) {
-  echo '<option value="'.$row["webaddress"].'">'.$row["pageName"].'</option>';
+  echo '<option value="'.$row["page_ID"].'">'.$row["pageName"].'</option>';
   }
   }
       ?>
@@ -136,11 +151,21 @@ if ($result->num_rows > 0) {
     <button type="submit" class="col-1 btn btn-outline-success">Tilføj</button>
   </form>
 
-  <form class="collapse row" id="removenav" action="phpscripts\removeNavLink.inc.php" method="POST">
-    <div class="col-2">
-      <select class="form-select" id="removenavselect" aria-label="Floating label select example">
-      
-      
+  <form class="collapse row" id="removenav"  method="POST">
+  	<input type="hidden" name="removeLink" value="1">
+
+  	<div class="col-2">
+      <select class="form-select" id="removenavselect" name="linkToRemove" aria-label="Floating label select example">
+            <?php
+		$sql = "SELECT navbaritems.id as id, pages.pageName as pageName FROM navbaritems INNER JOIN pages ON pages.page_ID=navbaritems.page_ID INNER JOIN navbar ON pages.site_ID=navbar.site_ID WHERE navbar.site_ID = ".$siteID."";
+		$result = $conn->query($sql);
+		if ($result->num_rows > 0) {
+		  // output data of each row
+		  while($row = $result->fetch_assoc()) {
+		  echo '<option value="'.$row["id"].'">'.$row["pageName"].'</option>';
+		  }
+		  }
+      ?>
       </select>
     </div>
     <input type="hidden" name="id" value="<?php echo $navbar["id"];?>">

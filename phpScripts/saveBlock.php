@@ -1,5 +1,7 @@
 <?php
-include "..\secrets\connectLocal.php";
+#include "..\secrets\connectLocal.php";
+include "../secrets/connect.php";
+
 $dataText=$_POST["data"];
 $bgColor=$_POST["bgcolor"];
 $shadowState=$_POST["shadowState"];

@@ -1,6 +1,6 @@
 <?php
-
-include "../secrets/connectLocal.php";
+#include "..\secrets\connectLocal.php";
+include "../secrets/connect.php";
 
 $title=$_POST["title"];
 
@@ -27,7 +27,7 @@ $sql=
 SET `title`='".$title."',
 `search`=".$search.",
 `alignment`=".$alignment." 
-WHERE ".$_POST["id"]."";
+WHERE ".$_POST["id"]."=id";
 
 $conn->query($sql);
 ?>

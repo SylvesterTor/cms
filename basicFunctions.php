@@ -48,5 +48,17 @@ function rgbaToHex($rgba) {
 	return $hex;
   }
   
+  function getAlpha($rgba) {
+	// Remove "rgba(" and ")" parts from input string
+	$rgba = str_replace(array('rgba(', ')'), '', $rgba);
+	
+	// Split color values into an array
+	$colors = explode(',', $rgba);
+	
+	// Get alpha value and convert to float
+	$alpha = trim($colors[3]);
+	return (float)$alpha;
+  }
 
+  
 ?>

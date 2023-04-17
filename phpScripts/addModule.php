@@ -1,5 +1,6 @@
 <?php
-include "..\secrets\connectLocal.php";
+#include "..\secrets\connectLocal.php";
+include "../secrets/connect.php";
 
 $zone = $_POST["zone_ID"];
 $position=$_POST["position"];
@@ -17,5 +18,4 @@ $updateTable=
 //
 $conn->query($updateTable);
 $conn->query($insertBlock);
-var_dump($updateTable);
 ?>
