@@ -2,44 +2,46 @@
 function navbar($siteID)
 {
   global $conn;
-$sql="SELECT * FROM navbar WHERE id = ".$siteID."";
-$result=$conn->query($sql);
-$navbar=$result->fetch_assoc();
-$sql="SELECT * FROM navbaritems WHERE navbar_ID = ".$navbar["id"]."";
-$navbarItems=$conn->query($sql);
+  $sql="SELECT * FROM navbar WHERE id = ".$siteID."";
+  $navbarResult=$conn->query($sql);
+  $navbar=$navbarResult->fetch_assoc();
+
+  $sql="SELECT * FROM navbaritems WHERE navbar_ID = ".$navbar["id"]."";
+  $navbarItems=$conn->query($sql);
   ?>
-<nav class="navbar navbar-expand-lg navbar-light bg-light <?php echo ($navbar["alignment"]==1) ? 'sticky-top':""; ?>">
-  <div class="container-fluid ">
-    <a class="navbar-brand" href="#" id="navbarTitle-<?php echo $navbar["id"]; ?>"><?php echo $navbar["title"]?></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav <?php echo ($navbar["alignment"]==1) ? 'me-auto':"ms-auto"; ?> mb-2 mb-lg-0">
-        <?php
-        if ($navbarItems->num_rows > 0) {
-          // output data of each row
-          while($row = $navbarItems->fetch_assoc()) {
-            echo "<li class='nav-item'><a href='index.php?page_ID=".$row["link"]."' class='nav-link'>".$row['text']."</a></li>";
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light <?php echo ($navbar["alignment"]==1) ? 'sticky-top':""; ?>">
+    <div class="container-fluid ">
+      <a class="navbar-brand" href="#" id="navbarTitle-<?php echo $navbar["id"]; ?>"><?php echo $navbar["title"]?></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav <?php echo ($navbar["alignment"]==1) ? 'me-auto':"ms-auto"; ?> mb-2 mb-lg-0">
+          <?php
+          if ($navbarItems->num_rows > 0) {
+            // output data of each row
+            while($row = $navbarItems->fetch_assoc()) {
+              echo "<li class='nav-item'><a href='index.php?page_ID=".$row["link"]."' class='nav-link'>".$row['text']."</a></li>";
+            }
           }
+          ?>
+        </ul>
+        <?php 
+        if($navbar["search"]==1){
+        ?>
+        <form class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+        <?php
         }
         ?>
-      </ul>
-      <?php 
-      if($navbar["search"]==1){
-      ?>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-      <?php
-      }
-      ?>
+      </div>
     </div>
-  </div>
-</nav>
-<?php
+  </nav>
+  <?php
 }
 
 function navbarEdit($siteID)

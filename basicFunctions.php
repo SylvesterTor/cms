@@ -1,5 +1,7 @@
 <?php
-
+/*
+This document is where we store basic custom php functions, that we might want to use again
+*/
 function getModuleType($module){
 	switch ($module["moduleType"]) {
 		case 1:
@@ -25,5 +27,26 @@ function getModuleType($module){
 	  }
 	  return $columns;
 }
+
+
+function rgbaToHex($rgba) {
+	// Remove the "rgba(" and ")" parts from the input string
+	$rgba = str_replace(array('rgba(', ')'), '', $rgba);
+	
+	// Split the color values into an array
+	$colors = explode(',', $rgba);
+	
+	// Convert the red, green, and blue values to hex values
+	$redHex = str_pad(dechex($colors[0]), 2, '0', STR_PAD_LEFT);
+	$greenHex = str_pad(dechex($colors[1]), 2, '0', STR_PAD_LEFT);
+	$blueHex = str_pad(dechex($colors[2]), 2, '0', STR_PAD_LEFT);
+	
+	// Combine the hex values into a single string
+	$hex = '#' . $redHex . $greenHex . $blueHex;
+	
+	// Return the hex color value
+	return $hex;
+  }
+  
 
 ?>

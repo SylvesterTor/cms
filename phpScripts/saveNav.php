@@ -3,6 +3,7 @@
 include "../secrets/connectLocal.php";
 
 $title=$_POST["title"];
+
 switch ($_POST["alignment"]) {
     case 'right':
         $alignment=0;
@@ -10,16 +11,17 @@ switch ($_POST["alignment"]) {
     case 'left':
         $alignment=1;
         break;
-    
     default:
         $alignment=0;
         break;
 }
+
 if(isset($_POST["search"])&&$_POST["search"]=="on"){
 	$search=1;
 }else{
 	$search=0;
 }
+
 $sql=
 "UPDATE `navbar` 
 SET `title`='".$title."',

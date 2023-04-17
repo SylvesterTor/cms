@@ -1,6 +1,4 @@
 <?php
-$site_ID=1;
-$page_ID=1;
 $logInError=false;
 $loggedIn=false;
 session_start();
@@ -21,7 +19,7 @@ include "phpScripts/navbar.php";
 include "basicFunctions.php";
 
 $get_pages->execute();
-$result=$get_pages->get_result();
+$pages=$get_pages->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +41,7 @@ $result=$get_pages->get_result();
         <h1>This is your admin page</h1>
         <h2>first site</h2>
     <?php
-    while($page=$result->fetch_assoc()){
+    while($page=$pages->fetch_assoc()){
         echo "<p>".$page["pageName"]."</p>";
         echo "<a href='edit.php?pageID=".$page["page_ID"]."'>".$page["pageName"]."</a>";
     }}

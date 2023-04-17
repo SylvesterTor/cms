@@ -73,36 +73,49 @@ while ($zone=$zones->fetch_assoc()) {
 	$columns=0;
 	$columns=getModuleType($module);
 
-
-	echo '<div class="row module" id="module-'.$module["module_ID"].'" data-position="'.$module["position"].'" data-parent="'.$module["zone_ID"].'">';
+	$shadow=""; 
+	if($module["shadow"]){
+		$shadow="shadow";
+	}else{
+		$shadow="";
+	}
+	echo '<div class="row module '.$shadow.'" id="module-'.$module["module_ID"].'" data-position="'.$module["position"].'" data-parent="'.$module["zone_ID"].'" style="background-color:'.$module["background"].'">';
     $blocks= $conn->query($get_blocks);
 
 	if($blocks->num_rows>0){
     //get blocks
     while ($block=$blocks->fetch_assoc()) {
+		$shadow=""; 
+		if($block["shadow"]){
+			$shadow="shadow";
+		}else{
+			$shadow="";
+		}
 		//standard blocks
-        echo "<div data-position='".$block["position"]."' data-parent='".$block["module_ID"]."' id='bigBlock-".$block["block_ID"]."' class='block position-relative ".$columns."' style='background-color:".$block["background"].";	 '>";
-        echo "<div class='editor' id='block-".$block["block_ID"]."'>";
+        echo "<div data-position='".$block["position"]."' data-parent='".$block["module_ID"]."' id='bigBlock-".$block["block_ID"]."' class='block position-relative ".$columns." ".$shadow."' style='background-color:".$block["background"].";	 '>";
+        echo "<div class='editor ' id='block-".$block["block_ID"]."' >";
         //block content
 		echo $block["content"];
         echo "</div>";
 		?>
 		<div class="btn-group dropup position-absolute bottom-0 end-0 ">
-  		<button type="button" onClick="edit(this);" data-target="<?php echo $block["block_ID"]?>" id="buttonBlock-<?php echo $block["block_ID"]?>" class="position-absolute bottom-0 end-0 btn btn-outline-dark" data-bs-toggle="dropdown" aria-expanded="false">
+  		<button type="button" onClick="edit(this,1);" data-target="<?php echo $block["block_ID"]?>" id="buttonBlock-<?php echo $block["block_ID"]?>" class="position-absolute bottom-0 end-0 btn btn-outline-dark">
     	Edit
   		</button>
-  <ul class="dropdown-menu position-sticky bottom-10 end-10">
-	<form action="">
+  <ul class="shadow bg-light position-fixed bottom-10 end-10 d-none" id="editBlock-<?php echo $block["block_ID"]?>"style="z-index:10;">
+	<form action="" id="editForm-<?php echo $block["block_ID"]?>" name="editForm-<?php echo $block["block_ID"]?>">
     <!-- Dropdown menu links -->
+	
 	<li class="dropdown-item">
-        <input name="shadow" onclick="addShadow(this)" data-target="<?php echo $block["block_ID"]; ?>" class="form-check-input" type="checkbox" 
-          data-target="">
         <label class="" for="shadow">Shadow</label>	
+        <input name="shadow" onclick="addShadow(this,1)" data-target="<?php echo $block["block_ID"]; ?>" class="form-check-input" type="checkbox" 
+          data-target="" <?php echo ($block["shadow"])? "checked":""; ?>>
 	</li>
 	<li class="dropdown-item">
 		<label class="btn" >Color
-		<input type="color" name="bg-color" id="" value="<?php echo $block["background"]; ?>"data-target="<?php echo $block["block_ID"]; ?>" onchange="blockColor(this);">
-	</label>
+		<input type="color" name="bgColor" id="" value="<?php echo rgbaToHex($module["background"]); ?>"data-target="<?php echo $block["block_ID"]; ?>" onchange="changeColor(this,1);">
+		<input type="range" name="bgOpacity" id=""data-target="<?php echo $block["block_ID"]; ?>" onchange="changeOpacity(this,1);">
+		</label>
 	</li>
 	</form>
 	<li class="dropdown-item">
@@ -118,6 +131,28 @@ while ($zone=$zones->fetch_assoc()) {
 	echo "Empty module here with no block. Either delete the module or add a block";
   echo "</div>";
 }
+?>
+<div class="dropdown">
+  <button class="btn btn-secondary" type="button" onClick="edit(this,2);" data-target="<?php echo $module["module_ID"]?>" id="buttonModule-<?php echo $module["module_ID"]?>">
+	module
+</button>
+<ul class="shadow bg-light position-fixed bottom-10 end-10 d-none" id="editModule-<?php echo $module["module_ID"]?>"style="z-index:10;">
+	<form action="" id="editModuleForm-<?php echo $module["module_ID"]?>" name="editModuleForm-<?php echo $module["module_ID"]?>">
+	<li class="dropdown-item">
+	<label class="btn" >Color
+		<input type="color" name="bgColor" id="" value="<?php echo rgbaToHex($module["background"]); ?>"data-target="<?php echo $module["module_ID"]; ?>" onchange="changeColor(this,2);">
+		<input type="range" name="bgOpacity" id=""data-target="<?php echo $module["module_ID"]; ?>" onchange="changeOpacity(this,2);">
+	</label>
+</li>
+<li class="dropdown-item">
+        <label class="" for="shadow">Shadow</label>	
+        <input name="shadow" onclick="addShadow(this,2)" data-target="<?php echo $module["module_ID"]; ?>" class="form-check-input" type="checkbox" 
+          data-target="" <?php echo ($module["shadow"])? "checked":""; ?>>
+	</li>
+	</form>
+	</ul>
+</div>
+<?php
   echo '</div>';
   }}else{
 	echo "<div data-position='0' data-parent='".$zone["zone_ID"]."' class='module position-relative'>";
@@ -168,27 +203,27 @@ while ($zone=$zones->fetch_assoc()) {
 		let editorIsset=false;
 		let editor="";
 		let editorButton="";
-  		let buttonstuff=false;
+		let currentEditorData="";
+		let editorReady=false;
 
 		//variable to select highlighted part
   		let highlightedClass="block";
 
-  		function editBlock(params) {
-			console.log(params);
-			console.log(buttonstuff);
-			if(buttonstuff){
-				buttonstuff=false;
-				params.innerHTML="Save";
-			}else{
-				params.innterHTML="Edit";
-				buttonstuff=true;
-			}
-		}
-
 		//function to editblock
-        function edit(params) {
+        function edit(params,type) {
+
+			//show form
+			let formElement;
+			if(type==1){
+			formElement=document.getElementById("editBlock-"+params.dataset.target);
+			}else{
+				formElement=document.getElementById("editModule-"+params.dataset.target);
+			}
+			formElement.classList.remove("d-none");
+
 			//remove all highlights
 			deHighlight(highlightedClass);
+
 			//get button
 			var button = document.getElementById(params.id);
 
@@ -198,20 +233,27 @@ while ($zone=$zones->fetch_assoc()) {
 				editorButton.innerHTML="text";
 				editorButton="";
 				editorIsset=false;
+				formElement.classList.add("d-none");
+				editorReady=false;
 			}
 			if(editorButton==button){
-				save(params);
+				formElement.classList.add("d-none");
+				save(params,type);
+				editorReady=false;
 			}else{
-
 				button.innerHTML="save";
 				editorButton=button;
-				editorIsset=true;
 			}
         }
 
 		function editText(params){
-			//select block element
-			var targetID="#block-";
+			if(editorIsset){
+				closeEditor();
+			}else{
+				editorReady=true;
+				//select block element
+				var targetID="#block-";
+				params.innerHTML="Text";
         		targetID+=params.dataset.target;
         		var element = document.querySelector(targetID);
 				//add editor to element
@@ -223,38 +265,136 @@ while ($zone=$zones->fetch_assoc()) {
         		    .catch( error => {
         		    console.error( error );
         		} );
+				editorIsset=true;
+			}
 		}
 
-        function save(params){
+		function closeEditor(){
+			if(editorIsset){
+			currentEditorData=editor.getData();
+			editor.destroy();
+			editor="";
+			editorIsset=false;
+			}
+		}
+
+        function save(params,type){
 			//get and edit button
             var button = document.getElementById(params.id);
             button.innerHTML="edit";
+
+			//get form
+			var formElement;
+			if(type==1){
+				formElement = document.forms["editForm-"+params.dataset.target];
+			}else{
+				formElement = document.forms["editModuleForm-"+params.dataset.target];
+			}
+			let shadow = formElement.shadow.checked;
+			let color=getRGBA(formElement.bgColor.value, formElement.bgOpacity.value)
+
 			//get target block
-            var targetID="#block-";
+			var targetID
+			var id;
+			if(type==1){
+				targetID="#block-";
+				id=params.dataset.target;
+			}else{
+				targetID="#module-";
+				id=params.dataset.target;
+			}
             targetID+=params.dataset.target;
-			var blockID=params.dataset.target;
             var element = document.querySelector(targetID);
-			
+
+			closeEditor();
 			//save in server
-			let editorData=editor.getData();
+			let editorData=currentEditorData;
+			if(type==1){
 			$.ajax({
             	url:"phpScripts/saveBlock.php",    //php scritpet
             	type: "post",    //request type,
-            	data: {data: editorData, block: blockID},
+            	data: {data: editorData,setText:editorReady, block: id, shadowState: shadow, bgcolor: color},
             	success:function(result){
             	    console.log(result);
             	}
         	});
+			}else{
+				$.ajax({
+            	url:"phpScripts/saveModule.php",    //php scritpet
+            	type: "post",    //request type,
+            	data: {module: id, shadowState: shadow, bgcolor: color},
+            	success:function(result){
+            	    console.log(result);
+            	}
+        	});
+			}
 
 			//remove editor from block
-			editor.destroy();
-			editor="";
 			editorButton.innerHTML="edit";
 			editorButton="";
-			editorIsset=false;
 			saveAlert("block saved");
         }
 
+	function baseColor(params,type){
+		closeEditor();
+		let targetID;
+		if(type==1){
+		targetID="bigBlock-"+params.dataset.target;
+		}else{
+		targetID="module-"+params.dataset.target;
+		}
+		return element=document.getElementById(targetID);
+	}
+
+	function changeColor(params,type){
+		let element=baseColor(params,type);
+		let brother = params.nextElementSibling;
+		let colorValue=params.value;
+		let rgbValue = getRGBA(colorValue, brother.value);
+		element.style.backgroundColor = `${rgbValue}`;
+	}
+
+	function getRGBA(rgb, opacity){
+		const redValue = parseInt(rgb.substring(1, 3), 16);
+  		const greenValue = parseInt(rgb.substring(3, 5), 16);
+  		const blueValue = parseInt(rgb.substring(5, 7), 16);
+		const alphaValue = parseInt(opacity)/100;
+  		const rgbValue = `rgba(${redValue}, ${greenValue}, ${blueValue},${alphaValue})`;
+		return rgbValue;
+	}
+	function changeOpacity(params,type){
+		let element=baseColor(params,type);
+		const currentColor = getComputedStyle(element).backgroundColor;
+
+		// Extract the RGBA values from the color
+		const rgbaValues = currentColor.match(/\d+/g);
+
+
+		// Set the new alpha value
+		const newAlpha = params.value/100; // Set this to your desired opacity value
+
+		// Set the background color with the updated alpha value
+		element.style.backgroundColor = `rgba(${rgbaValues[0]}, ${rgbaValues[1]}, ${rgbaValues[2]}, ${newAlpha})`;
+	}
+
+
+	function addShadow(params,type){
+		closeEditor();
+		let targetID;
+		if(type==1){
+		targetID="bigBlock-"+params.dataset.target;
+		}else{
+		targetID="module-"+params.dataset.target;
+		}
+
+		let element=document.getElementById(targetID);
+		console.log(targetID);
+		if(params.checked){
+			element.classList.add("shadow");
+		}else {
+			element.classList.remove("shadow");
+		}
+	}
 
 		function highlightBlockNModule(type){
 			highlightClass(type);
@@ -309,7 +449,6 @@ while ($zone=$zones->fetch_assoc()) {
 		}
 		
 		function addBlock(pos, module) {
-			console.log("hej");
 			$.ajax({
             	url:"phpScripts/addBlock.php",    //php scritpet
             	type: "post",    //request type,
@@ -420,22 +559,6 @@ while ($zone=$zones->fetch_assoc()) {
 		alert(string);
 	}
 
-	function blockColor(params){
-		let targetID="bigBlock-"+params.dataset.target;
-		let element=document.getElementById(targetID);
-		element.style.backgroundColor=params.value;
-	}
-
-	function addShadow(params){
-		let targetID="bigBlock-"+params.dataset.target;
-		let element=document.getElementById(targetID);
-		console.log(params.value);
-		if(params.checked){
-			element.classList.add("shadow");
-		}else {
-			element.classList.remove("shadow");
-		}
-	}
     </script>
 
 <?php

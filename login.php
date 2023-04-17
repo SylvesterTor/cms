@@ -5,6 +5,7 @@ $loggedIn=false;
 
 session_start();
 
+//check if user is logged in
 if(isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]){
     $loggedIn=true;
 }else{
@@ -17,18 +18,18 @@ include "phpScripts/navbar.php";
 include "basicFunctions.php";
 
 if(isset($_GET["username"])){
-$username=$_GET["username"];
-$logIn->execute();
-$result=$logIn->get_result();
-if($result->num_rows>0){
-    $row=$result->fetch_assoc();
-    if($row["password"]==$_GET["password"]){
-        session_start();
-        $siteId=$row["site_ID"];
-        $loggedIn=true;
-        $_SESSION["loggedIn"]=true;
-        $_SESSION["username"]=$username;
-        $_SESSION["siteId"]=$siteId;
+    $username=$_GET["username"];
+    $logIn->execute();
+    $result=$logIn->get_result();
+    if($result->num_rows>0){
+        $row=$result->fetch_assoc();
+        if($row["password"]==$_GET["password"]){
+            session_start();
+            $siteId=$row["site_ID"];
+            $loggedIn=true;
+            $_SESSION["loggedIn"]=true;
+            $_SESSION["username"]=$username;
+            $_SESSION["siteId"]=$siteId;
     }
 }else {
     $loggedIn=false;
