@@ -3,26 +3,23 @@ $_GET["site_ID"]=1;
 $_GET["page_ID"]=1;
 $site_ID=$_GET["site_ID"];
 $page_ID=$_GET["page_ID"]; 
+if(!isset($_GET["page_ID"])){
+  header('Location: pagenotfound.php');
+}
+
 include "secrets/connectLocal.php";
-include "sql_statements.php";
-$get_page->execute();
-$page=$get_page->get_result();
-$pageInfo=$page->fetch_assoc();
-include "navbar.php";
-include "blocks.php";
-
+include "phpScripts/navbar.php";
+include "basicFunctions.php";
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style/color1/color1.css">
-    <title><?php echo $pageInfo["pageName"]; ?></title>
+    <link rel="stylesheet" href="style/style.css">
+    <title>index</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"
     integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
@@ -33,7 +30,11 @@ include "blocks.php";
     integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous">
   </script>
 </head>
-<body class="container-fluid p-0 ">
+<body>
+  <?php
+  navbar(1);
+  ?>
+  <div class="container-fluid">
 <?php
 $get_zones=
 'SELECT * FROM module_zone WHERE page_ID = '.$page_ID.' ORDER BY placement ASC';
@@ -43,60 +44,37 @@ while ($zone=$zones->fetch_assoc()) {
   'SELECT * FROM module WHERE zone_ID = '.$zone["zone_ID"].'';
   $modules= $conn->query($get_modules);
   while ($module=$modules->fetch_assoc()) {
+	$columns=0;
+	$columns=getModuleType($module);
+
     $get_blocks=
-    'SELECT * FROM module 
-    RIGHT JOIN imagestext ON imagestext.module_ID=module.module_ID
-    RIGHT JOIN textarea ON textarea.module_ID=module.module_ID
-    WHERE module.zone_ID = '.$zone["zone_ID"].'';
-    //print_r($get_blocks);
+    'SELECT * FROM blocks where module_ID="'.$module["module_ID"].'" ORDER BY position ASC';
     $blocks= $conn->query($get_blocks);
+    if($blocks->num_rows>0){
+    echo '<div class="row module">';
     while ($block=$blocks->fetch_assoc()) {
-      # code...
-    //print_r($module);
-    //print_r($get_blocks);
-    //switch ($module["type"]) {
-    //  case 1:
-    //    # code...
-    //    navbar($site_ID);
-    //    break;
-    //  case 2:
-    //    # code...
-    //    textarea($module);
-    //    break;
-    //  case 3:
-    //     # code...
-    //     imgText($module);
-    //     break;  
-    //  case 4:
-    //    # code...
-    //    break;
-    //  default:
-    //    # code...
-    //    break;
-    //}
+      echo '<div class="block '.$columns.'">';
+      echo '<div class="content" id="'.$block["block_ID"].'">';
+      echo $block["content"];
+      echo '</div>';
+      echo '</div>';
   }
-  }
+  echo '</div>';
+}
   }
 
-navbar(1);
 
+  }
 ?>
 
 
-<footer>
-  footer
-</footer>
-
+</div>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"
     integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
   integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script>
 
     </script>
 </body>
-
-<style>
-    
-</style>
-
 </html>
