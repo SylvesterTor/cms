@@ -81,17 +81,18 @@ while ($zone=$zones->fetch_assoc()) {
     //get blocks
     while ($block=$blocks->fetch_assoc()) {
 		//standard blocks
-        echo "<div data-position='".$block["position"]."' data-parent='".$block["module_ID"]."' id='bigBlock-".$block["block_ID"]."' class='block position-relative ".$columns."'>";
+        echo "<div data-position='".$block["position"]."' data-parent='".$block["module_ID"]."' id='bigBlock-".$block["block_ID"]."' class='block position-relative ".$columns."' style='background-color:".$block["background"].";	 '>";
         echo "<div class='editor' id='block-".$block["block_ID"]."'>";
         //block content
 		echo $block["content"];
         echo "</div>";
 		?>
 		<div class="btn-group dropup position-absolute bottom-0 end-0 ">
-  		<button type="button" class="position-absolute bottom-0 end-0 btn btn-outline-dark" data-bs-toggle="dropdown" aria-expanded="false">
+  		<button type="button" onClick="edit(this);" data-target="<?php echo $block["block_ID"]?>" id="buttonBlock-<?php echo $block["block_ID"]?>" class="position-absolute bottom-0 end-0 btn btn-outline-dark" data-bs-toggle="dropdown" aria-expanded="false">
     	Edit
   		</button>
-  <ul class="dropdown-menu">
+  <ul class="dropdown-menu position-sticky bottom-10 end-10">
+	<form action="">
     <!-- Dropdown menu links -->
 	<li class="dropdown-item">
         <input name="shadow" onclick="addShadow(this)" data-target="<?php echo $block["block_ID"]; ?>" class="form-check-input" type="checkbox" 
@@ -100,11 +101,12 @@ while ($zone=$zones->fetch_assoc()) {
 	</li>
 	<li class="dropdown-item">
 		<label class="btn" >Color
-			<input type="color" name="" id="" data-target="<?php echo $block["block_ID"]; ?>" onchange="blockColor(this);">
+		<input type="color" name="bg-color" id="" value="<?php echo $block["background"]; ?>"data-target="<?php echo $block["block_ID"]; ?>" onchange="blockColor(this);">
 	</label>
 	</li>
+	</form>
 	<li class="dropdown-item">
-	<?php echo '<button class="btn" onClick="edit(this);" data-target="'.$block["block_ID"].'" id="buttonBlock-'.$block["block_ID"].'">text</button>';?>
+	<?php echo '<button class="btn" onClick="editText(this);" data-target="'.$block["block_ID"].'" id="buttonBlock-'.$block["block_ID"].'">text</button>';?>
 	</li>
   </ul>
 </div>
@@ -131,7 +133,6 @@ while ($zone=$zones->fetch_assoc()) {
     Edit page
   </button>
   <ul class="dropdown-menu">
-	<form action="">
     <!-- Dropdown menu links -->
 	<li class="dropdown-item">
 		<button class="btn" onClick="highlightModule()">Add module</button>
@@ -145,7 +146,6 @@ while ($zone=$zones->fetch_assoc()) {
 	<li class="dropdown-item">
 		<button class="btn">Add page</button>
 	</li>
-	</form>
   </ul>
   
 </div>
@@ -168,10 +168,23 @@ while ($zone=$zones->fetch_assoc()) {
 		let editorIsset=false;
 		let editor="";
 		let editorButton="";
+  		let buttonstuff=false;
 
 		//variable to select highlighted part
   		let highlightedClass="block";
-		
+
+  		function editBlock(params) {
+			console.log(params);
+			console.log(buttonstuff);
+			if(buttonstuff){
+				buttonstuff=false;
+				params.innerHTML="Save";
+			}else{
+				params.innterHTML="Edit";
+				buttonstuff=true;
+			}
+		}
+
 		//function to editblock
         function edit(params) {
 			//remove all highlights
@@ -190,8 +203,15 @@ while ($zone=$zones->fetch_assoc()) {
 				save(params);
 			}else{
 
-				//select block element
-        		var targetID="#block-";
+				button.innerHTML="save";
+				editorButton=button;
+				editorIsset=true;
+			}
+        }
+
+		function editText(params){
+			//select block element
+			var targetID="#block-";
         		targetID+=params.dataset.target;
         		var element = document.querySelector(targetID);
 				//add editor to element
@@ -203,12 +223,7 @@ while ($zone=$zones->fetch_assoc()) {
         		    .catch( error => {
         		    console.error( error );
         		} );
-
-				button.innerHTML="save";
-				editorButton=button;
-				editorIsset=true;
-			}
-        }
+		}
 
         function save(params){
 			//get and edit button
@@ -257,7 +272,6 @@ while ($zone=$zones->fetch_assoc()) {
 			  		(event) => {
 						position_before=parseInt(element.dataset.position)-1;
 						position_after=parseInt(element.dataset.position)+1;
-						console.log(element.dataset.position);
 						parent=element.dataset.parent;
 						if(!element.classList.contains("addMode") && element.classList.contains(highlightedClass)){
 						removeButtons();
@@ -332,7 +346,6 @@ while ($zone=$zones->fetch_assoc()) {
 			const modules = document.querySelectorAll('.'+params);
 			modules.forEach(element => {
 				element.classList.remove("border","border-dark", "addMode");
-				
 			});
 		}
 
