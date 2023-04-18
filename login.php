@@ -33,7 +33,7 @@ if(isset($_POST["username"])){
             $loggedIn=true;
             $_SESSION["loggedIn"]=true;
             $_SESSION["username"]=$username;
-            $_SESSION["siteId"]=$siteId;
+            $_SESSION["user_ID"]=$row["user_ID"];
     }
 }else {
     $loggedIn=false;

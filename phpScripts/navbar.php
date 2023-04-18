@@ -2,10 +2,9 @@
 function navbar($siteID)
 {
   global $conn;
-  $sql="SELECT * FROM navbar WHERE id = ".$siteID."";
+  $sql="SELECT * FROM navbar WHERE site_ID = ".$siteID."";
   $navbarResult=$conn->query($sql);
   $navbar=$navbarResult->fetch_assoc();
-
   $sql="SELECT * FROM navbaritems INNER JOIN pages ON pages.page_ID=navbaritems.page_ID WHERE navbaritems.navbar_ID = ".$navbar["id"]."";
   $navbarItems=$conn->query($sql);
   ?>
@@ -58,7 +57,7 @@ function navbarEdit($siteID)
 			$conn->query($sql);
 		}
 	}
-$sql="SELECT * FROM navbar WHERE id = ".$siteID."";
+$sql="SELECT * FROM navbar WHERE site_ID = ".$siteID."";
 $result=$conn->query($sql);
 $navbar=$result->fetch_assoc();
 $sql="SELECT * FROM navbaritems INNER JOIN pages ON pages.page_ID=navbaritems.page_ID WHERE navbaritems.navbar_ID = ".$navbar["id"]."";
@@ -82,7 +81,7 @@ $navbarItems=$conn->query($sql);
         if ($navbarItems->num_rows > 0) {
           // output data of each row
           while($row = $navbarItems->fetch_assoc()) {
-			echo "<li class='nav-item'><a href='edit.php?pageID=".$row["page_ID"]."' class='nav-link'>".$row['pageName']."</a></li>";
+			echo "<li class='nav-item'><a href='edit.php?page_ID=".$row["page_ID"]."' class='nav-link'>".$row['pageName']."</a></li>";
 		}
         }
           ?>
