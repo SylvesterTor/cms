@@ -1,8 +1,8 @@
 <?php
+session_start();
 include "pageHandler.php";
 include "../secrets/connect.php";
 
-session_start();
 $siteName=$_POST["siteName"];
 $user_ID=$_SESSION["user_ID"];
 
