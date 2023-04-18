@@ -51,7 +51,7 @@ while ($zone=$zones->fetch_assoc()) {
         $shadow="";
       }
 	  //create module div
-      echo '<div class="row m-5 '.$shadow.'" style="background-color:'.$module["background"].'">';
+      echo '<div class="row m-5 '.$shadow.'" id="module-'.$module["module_ID"].'" style="background-color:'.$module["background"].'">';
     	while ($block=$blocks->fetch_assoc()) {
 			$shadow=""; 
 			if($block["shadow"]){
@@ -60,7 +60,7 @@ while ($zone=$zones->fetch_assoc()) {
 			  $shadow="";
 			}
 			//create blocks and display its content
-			echo '<div class="block '.$columns. ' '.$shadow.'" style="background-color:'.$block["background"].'";>';
+			echo '<div class="block '.$columns. ' '.$shadow.'" id="block-'.$block["block_ID"].'" style="background-color:'.$block["background"].'";>';
 			echo '<div class="content" id="'.$block["block_ID"].'">';
 			echo $block["content"];
 			echo '</div>';

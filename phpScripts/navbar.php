@@ -1,5 +1,5 @@
 <?php
-function navbar($siteID)
+function navbar($siteID,$pre="")
 {
   global $conn;
   $sql="SELECT * FROM navbar WHERE site_ID = ".$siteID."";
@@ -22,7 +22,7 @@ function navbar($siteID)
           if ($navbarItems->num_rows > 0) {
             // output data of each row
             while($row = $navbarItems->fetch_assoc()) {
-              echo "<li class='nav-item'><a href='index.php?page_ID=".$row["page_ID"]."' class='nav-link'>".$row['pageName']."</a></li>";
+              echo "<li class='nav-item'><a href='".$pre."index.php?page_ID=".$row["page_ID"]."' class='nav-link'>".$row['pageName']."</a></li>";
             }
           }
           ?>
@@ -30,8 +30,9 @@ function navbar($siteID)
         <?php 
         if($navbar["search"]==1){
         ?>
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <form class="d-flex" action="../search.php" method="POST">
+          <input type="hidden" name="site_ID" value="<?php echo $navbar["site_ID"];?>">
+          <input class="form-control me-2" type="search" name="searchString" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-success" type="submit">Search</button>
         </form>
         <?php

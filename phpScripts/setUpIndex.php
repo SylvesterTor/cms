@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 // Read the JSON file 
 $json = file_get_contents('setUp.json');
   
@@ -31,4 +33,4 @@ include "../sql_statements.php";
       header('Location: index.php');
     }
 
-session_start();?>
+?>

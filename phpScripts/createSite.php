@@ -1,7 +1,6 @@
 <?php
-include "controlUser.php";
-include "pageHandler.php";
 include "../secrets/connect.php";
+include "pageHandler.php";
 include "controlUser.php";
 $siteName=$_POST["siteName"];
 $user_ID=$_SESSION["user_ID"];
@@ -38,10 +37,9 @@ $addAdminPair->execute();
 $frontPage_ID=addPage($data,1);
 
 
-mkdir("../".$siteName."", 0700);
+mkdir("../".$siteName."", 0755);
 $fp=fopen("../".$siteName.'/index.php','w');
-fwrite($fp,'
-<?php
+fwrite($fp,'<?php
 include "../phpScripts/setUpIndex.php";   
 include "../index.php";      
 ?>');

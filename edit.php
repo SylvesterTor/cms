@@ -10,8 +10,8 @@ include "sql_statements.php";
 
 if(isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]){
     $loggedIn=true;
-	if(isset($_GET["pageID"])){
-		$page_ID=$_GET["pageID"];
+	if(isset($_GET["page_ID"])){
+		$page_ID=$_GET["page_ID"];
 	}
 	if(isset($_SESSION["user_ID"])){
 		$user= $_SESSION["user_ID"];
@@ -36,6 +36,10 @@ if(isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]){
 include "phpScripts/navbar.php";
 include "basicFunctions.php";
 
+    if(!$loggedIn){
+			header('Location: login.php');
+		
+    }else{
 ?>
 
 <!DOCTYPE html>
@@ -49,12 +53,8 @@ include "basicFunctions.php";
     <title>Edit page</title>
 </head>
 <body>
-    <?php
-    if(!$loggedIn){
-			header('Location: login.php');
-		
-    }else{
-
+    
+<?php
 		navbarEdit($page["site_ID"]);
 		?>
 
@@ -557,6 +557,7 @@ while ($zone=$zones->fetch_assoc()) {
             id = param.id;
             target=param.dataset.target;
             console.log(target);
+			
             // Selecting the input element and get its value 
            var inputVal = document.getElementById(id).value;
            var element =  document.getElementById(param.dataset.target);

@@ -52,9 +52,9 @@ include "basicFunctions.php";
         <div class="row">
         <?php
         $getSites = 
-        'SELECT * FROM adminPairing 
-        INNER JOIN `admin` ON `admin`.user_ID=adminPairing.user_ID
-        INNER JOIN `site` ON `site`.site_ID=adminPairing.site_ID
+        'SELECT * FROM adminpairing 
+        INNER JOIN `admin` ON `admin`.user_ID=adminpairing.user_ID
+        INNER JOIN `site` ON `site`.site_ID=adminpairing.site_ID
         WHERE `admin`.user_ID = '.$_SESSION["user_ID"];
         $sites=$conn->query($getSites);
         $_SESSION["sites"]=(array) null;
@@ -74,7 +74,7 @@ include "basicFunctions.php";
                 while($page=$pages->fetch_assoc()){
                     echo '<div class="col-5 m-2">';
                     echo "<p class='m-0' >".$page["pageName"]."</p>";
-                    echo "<a class='m-0' href='edit.php?pageID=".$page["page_ID"]."'>Go to ".$page["pageName"]."</a>";
+                    echo "<a class='m-0' href='edit.php?page_ID=".$page["page_ID"]."'>Go to ".$page["pageName"]."</a>";
                     ECHO '</div>';
                 }
 
