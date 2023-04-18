@@ -1,8 +1,7 @@
 <?php
-$siteId;
-$page_ID=1;
 $logInError=false;
 $loggedIn=false;
+$site_ID;
 session_start();
 #include "secrets/connectLocal.php";
 include "secrets/connect.php";
@@ -11,28 +10,36 @@ include "sql_statements.php";
 
 if(isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]){
     $loggedIn=true;
-	if(isset($_SESSION["siteId"])){
-		$siteId=$_SESSION["siteId"];
+	if(isset($_GET["page_ID"])){
+		$page_ID=$_GET["page_ID"];
 	}
-	if(isset($_GET["pageID"])){
-		$page_ID=$_GET["pageID"];
-	}
-	if(isset($_SESSION["user"])){
-		$user= $_SESSION["user"];
+	if(isset($_SESSION["user_ID"])){
+		$user= $_SESSION["user_ID"];
 	}
 	$get_page->execute();
 	$page=$get_page->get_result();
 	$page=$page->fetch_assoc();
-	if($page["site_ID"]!=$siteId){
-		$loggedIn=false;
+	
+	if(isset($_SESSION["sites"])){
+		if(in_array($page["site_ID"],$_SESSION["sites"])){
+			$site_ID=$page["site_ID"];
+		}
+		else{
+			$loggedIn=false;
+		}
 	}
+
 }else{
-    $loggedIn=false;
+			$loggedIn=false;
 }
 
 include "phpScripts/navbar.php";
 include "basicFunctions.php";
 
+    if(!$loggedIn){
+			header('Location: login.php');
+		
+    }else{
 ?>
 
 <!DOCTYPE html>
@@ -46,12 +53,8 @@ include "basicFunctions.php";
     <title>Edit page</title>
 </head>
 <body>
-    <?php
-    if(!$loggedIn){
-			header('Location: login.php');
-		
-    }else{
-
+    
+<?php
 		navbarEdit($page["site_ID"]);
 		?>
 
@@ -554,6 +557,7 @@ while ($zone=$zones->fetch_assoc()) {
             id = param.id;
             target=param.dataset.target;
             console.log(target);
+			
             // Selecting the input element and get its value 
            var inputVal = document.getElementById(id).value;
            var element =  document.getElementById(param.dataset.target);

@@ -1,7 +1,7 @@
 <?php
 #include "..\secrets\connectLocal.php";
 include "../secrets/connect.php";
-
+include "controlUser.php";
 $bgColor=$_POST["bgcolor"];
 $shadowState=$_POST["shadowState"];
 

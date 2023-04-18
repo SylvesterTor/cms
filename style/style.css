@@ -10693,4 +10693,8 @@ textarea.form-control-lg {
 
 .block {
   padding: 5px;
+}
+
+.searchBox:hover {
+  background-color: rgb(230, 233, 233);
 }/*# sourceMappingURL=style.css.map */

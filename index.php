@@ -1,21 +1,4 @@
-<?php
-$page_ID=$_GET["page_ID"]; 
 
-if(!isset($_GET["page_ID"])){
-  header('Location: pagenotfound.php');
-}
-
-#include "secrets/connectLocal.php";
-include "secrets/connect.php";
-
-include "phpScripts/navbar.php";
-include "basicFunctions.php";
-include "sql_statements.php";
-?>
- <?php
-      $get_page->execute();
-      $page=$get_page->get_result();
-      $page=$page->fetch_assoc();?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,6 +6,8 @@ include "sql_statements.php";
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="../style/style.css">
+
     <title><?php echo $page["pageName"];?></title>
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -66,7 +51,7 @@ while ($zone=$zones->fetch_assoc()) {
         $shadow="";
       }
 	  //create module div
-      echo '<div class="row m-5 '.$shadow.'" style="background-color:'.$module["background"].'">';
+      echo '<div class="row m-5 '.$shadow.'" id="module-'.$module["module_ID"].'" style="background-color:'.$module["background"].'">';
     	while ($block=$blocks->fetch_assoc()) {
 			$shadow=""; 
 			if($block["shadow"]){
@@ -75,7 +60,7 @@ while ($zone=$zones->fetch_assoc()) {
 			  $shadow="";
 			}
 			//create blocks and display its content
-			echo '<div class="block '.$columns. ' '.$shadow.'" style="background-color:'.$block["background"].'";>';
+			echo '<div class="block '.$columns. ' '.$shadow.'" id="block-'.$block["block_ID"].'" style="background-color:'.$block["background"].'";>';
 			echo '<div class="content" id="'.$block["block_ID"].'">';
 			echo $block["content"];
 			echo '</div>';
