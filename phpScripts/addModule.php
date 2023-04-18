@@ -1,7 +1,7 @@
 <?php
 #include "..\secrets\connectLocal.php";
 include "../secrets/connect.php";
-
+include "controlUser.php";
 $zone = $_POST["zone_ID"];
 $position=$_POST["position"];
 $columns=$_POST["col"];

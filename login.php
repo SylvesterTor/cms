@@ -67,10 +67,12 @@ if(isset($_POST["username"])){
             <h1>login to edit your page</h1>
             <?php echo ($logInError)?"<p>please try again, username or password dont match up</p>":"";?>
             <label for="username">Username</label>
-            <input class="form-control" type="text" name="username" id="">
-            <label for="password">Password</label>
-            <input class="form-control" type="password" name="password" id="">
+            <input class="form-control" type="text" id="username" name="username" id="">
+            <label for="password" >Password</label>
+            <input id="password"  class="form-control" type="password" name="password" id="">
             <button type="submit" class="mt-3 col-4 submit btn btn-outline-grey">Log in</button>
+            <a class="mt-3 col-4 submit btn btn-outline-grey" href="signup.php">Sign up</a>
+
         </form>
     </div>
 

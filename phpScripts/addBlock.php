@@ -1,7 +1,8 @@
 <?php
+
 #include "..\secrets\connectLocal.php";
 include "../secrets/connect.php";
-
+include "controlUser.php";
 $modules = $_POST["module_ID"];
 $position=$_POST["position"];
 
