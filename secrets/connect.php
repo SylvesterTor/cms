@@ -1,5 +1,5 @@
 <?php
-
+/*
 $servername = "mysql75.unoeuro.com";
 $username = "tvs2_dk";
 $password = "DeGkmgxdyFEHcpfBntza";
@@ -9,8 +9,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
   }
+*/
 
-/*
   $servername = "localhost";
   $username = "root";
   $password = "Torweb.dk";
@@ -19,5 +19,5 @@ if ($conn->connect_error) {
   
   if ($conn->connect_error) {
       die("Connection failed: " . $conn->connect_error);
-    }*/
+    }
 ?>

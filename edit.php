@@ -87,7 +87,7 @@ while ($zone=$zones->fetch_assoc()) {
 	}else{
 		$shadow="";
 	}
-	echo '<div class="row m-5 '.$shadow.'" id="module-'.$module["module_ID"].'" data-position="'.$module["position"].'" data-parent="'.$module["zone_ID"].'" style="background-color:'.$module["background"].'">';
+	echo '<div class="row m-5 module '.$shadow.'" id="module-'.$module["module_ID"].'" data-position="'.$module["position"].'" data-parent="'.$module["zone_ID"].'" style="background-color:'.$module["background"].'">';
     $blocks= $conn->query($get_blocks);
 
 	if($blocks->num_rows>0){
@@ -128,7 +128,8 @@ while ($zone=$zones->fetch_assoc()) {
 	</form>
 	<li class="dropdown-item">
 	<?php echo '<button class="btn" onClick="editText(this);" data-target="'.$block["block_ID"].'" id="buttonBlock-'.$block["block_ID"].'">text</button>';?>
-	</li>
+	<?php remove(1, $block["block_ID"]); ?>	
+</li>
   </ul>
 </div>
 		<?php
@@ -158,6 +159,7 @@ while ($zone=$zones->fetch_assoc()) {
           data-target="" <?php echo ($module["shadow"])? "checked":""; ?>>
 	</li>
 	</form>
+	<?php remove(2, $module["module_ID"]); ?>	
 	</ul>
 </div>
 <?php
@@ -407,6 +409,7 @@ while ($zone=$zones->fetch_assoc()) {
 
 		function highlightBlockNModule(type){
 			highlightClass(type);
+			
 			let allModules = getElements(type);
 			let func;
 			let parent;
@@ -488,6 +491,27 @@ while ($zone=$zones->fetch_assoc()) {
 			}
 		}
 
+		function removeBlockNModule(type, element){
+			let targetID;
+			if(type==1){
+				targetID="bigBlock-"+element;
+			}else{
+				targetID="module-"+element;
+			}
+			let _element=document.getElementById(targetID);
+			$.ajax({
+            	url:"phpScripts/removeBlockNModule.php",    //php scritpet
+            	type: "post",    //request type,
+            	data: {typeOfElement: type, idOfElement: element},
+            	success:function(result){
+            	    console.log(result);
+            	}
+        	});
+			setTimeout(function() {
+			  location.reload();
+			}, 500);
+		}
+
 		function deHighlight(params) {
 			//remove all buttons and remove the border from previous highligted divs
 			removeButtons();
@@ -509,6 +533,7 @@ while ($zone=$zones->fetch_assoc()) {
 			const modules = document.querySelectorAll("."+classToHightligt);
 			modules.forEach(element => {
 				element.classList.add("border","border-dark");
+				console.log(element);
 			});
 			highlightedClass=classToHightligt;
 		}

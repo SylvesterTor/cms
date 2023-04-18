@@ -31,7 +31,7 @@ $zones = $conn->query($get_zones);
 while ($zone=$zones->fetch_assoc()) {
 
   $get_modules=
-  'SELECT * FROM module WHERE zone_ID = '.$zone["zone_ID"].'';
+  'SELECT * FROM module WHERE zone_ID = '.$zone["zone_ID"].' ORDER BY position ASC';
   
   $modules= $conn->query($get_modules);
   

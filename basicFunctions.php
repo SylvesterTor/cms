@@ -61,4 +61,15 @@ function rgbaToHex($rgba) {
   }
 
   
+  function remove($type, $element){
+	?>
+	<li class="dropdown-item">
+
+	<?php
+		echo '<button class="btn btn-danger" onclick="removeBlockNModule('.$type.','.$element.')" data-target="'.$element.'" id="removeModule-'.$element.'">remove</button>';
+	?>
+	</li>
+	<?php
+
+  }
 ?>
