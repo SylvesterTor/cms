@@ -11,9 +11,13 @@ if ($conn->connect_error) {
   }
 */
 
+<<<<<<< HEAD
+=======
+*/
+>>>>>>> LoginPage
   $servername = "localhost";
   $username = "root";
-  $password = "Torweb.dk";
+  $password = "";
   $dbname = "cms";
   $conn = new mysqli($servername, $username, $password, $dbname);
   

@@ -1,7 +1,7 @@
 <?php
 $logIn = $conn->prepare(
-    "SELECT * FROM admin WHERE username = ?");
-$logIn->bind_param("s", $username);
+    "SELECT * FROM admin WHERE mail = ?");
+$logIn->bind_param("s", $email);
 
 
 $get_page = $conn->prepare(
