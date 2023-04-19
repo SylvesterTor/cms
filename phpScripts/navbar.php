@@ -47,20 +47,6 @@ function navbar($siteID,$pre="")
 function navbarEdit($siteID)
 {
 	global $conn;
-  if(isset($_POST["newLink"]) && $_SERVER["REQUEST_METHOD"]=="POST" && $_POST["newLink"]==1){
-    var_dump($_POST);
-		$sql=
-		"INSERT INTO `navbaritems`(`navbar_ID`, `page_ID`) VALUES (".$_POST["id"].",".$_POST["page"].")";
-		$conn->query($sql);
-    unset($_POST["newLink"]);
-	}else{
-		if(isset($_POST["removeLink"])&& $_SERVER["REQUEST_METHOD"]=="POST" && $_POST["removeLink"]==1){
-			$sql=
-			"DELETE FROM navbaritems WHERE id = ".$_POST["linkToRemove"].";";
-			$conn->query($sql);
-      unset($_POST["removeLink"]);
-		}
-	}
 
 $sql="SELECT * FROM navbar WHERE site_ID = ".$siteID."";
 $result=$conn->query($sql);
@@ -134,7 +120,7 @@ $navbarItems=$conn->query($sql);
     </div>
     <input type="hidden" name="navbarID" value="<?php echo $navbar["id"]; ?>">
   </form>
-  <form class="collapse row" id="collapseExample" method="POST">
+  <form class="collapse row" id="collapseExample" method="POST" action="phpScripts/navbarHandler.php">
     <div class="col-2">
       <select name="page" class="form-select" id="floatingSelect" aria-label="Floating label select example">
       
@@ -150,11 +136,12 @@ if ($result->num_rows > 0) {
       ?>
       </select>
     </div>
+    <input type="hidden" name="back" value="<?php echo $_SERVER["REQUEST_URI"];?>">
     <input type="hidden" name="id" value="<?php echo $navbar["id"];?>">
-    <button type="submit" name="newLink" class="col-1 btn btn-outline-success">Tilføj</button>
+    <button type="submit" name="newLink" value="1"  class="col-1 btn btn-outline-success">Tilføj</button>
   </form>
 
-  <form class="collapse row" id="removenav"  method="POST">
+  <form class="collapse row" id="removenav" action="phpScripts/navbarHandler.php" method="POST">
   	<input type="hidden" name="removeLink" value="1">
 
   	<div class="col-2">
@@ -171,6 +158,7 @@ if ($result->num_rows > 0) {
       ?>
       </select>
     </div>
+    <input type="hidden" name="back" value="<?php echo $_SERVER["REQUEST_URI"];?>">
     <input type="hidden" name="id" value="<?php echo $navbar["id"];?>">
     <button type="submit" class="col-1 btn btn-outline-danger">Fjern</button>
   </form>

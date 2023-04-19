@@ -151,7 +151,7 @@ include "basicFunctions.php";
         ?>
         <form action="phpScripts/createSite.php" method="POST">
         <label for="siteName">Name your site
-            <input type="text" name="siteName" id="siteName" require>
+            <input type="text" name="siteName" id="siteName" required>
         </label>
         <button type="submit">Create new page</button>
         <p>This will only work when selecting name, that doesnt exist</p>

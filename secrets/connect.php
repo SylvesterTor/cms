@@ -10,14 +10,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
   }
 */
-
-<<<<<<< HEAD
-=======
-*/
->>>>>>> LoginPage
   $servername = "localhost";
   $username = "root";
-  $password = "";
+  $password = "Torweb.dk";
   $dbname = "cms";
   $conn = new mysqli($servername, $username, $password, $dbname);
   
