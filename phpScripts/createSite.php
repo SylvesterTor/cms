@@ -14,7 +14,9 @@ $otherSites=$checkForSites->get_result();
 if($otherSites->fetch_assoc()["exists"]==1){
     header('Location: ../admin.php?exists=1');
 }else{
+
 $siteName=$_POST["siteName"];
+$pageName=$_POST["pageName"];
 $createSite = $conn->prepare("INSERT INTO `site` (`webaddress`,`data_published`) VALUES (?,NOW())");
 $createSite->bind_param("s", $siteName);
 $createSite->execute();
@@ -23,7 +25,7 @@ $site_ID=$conn->insert_id;
 
 
 $data;
-$data["pageName"]=$siteName;
+$data["pageName"]=$pageName;
 $data["mainSite"]=$site_ID;
 
 $createNavbar=

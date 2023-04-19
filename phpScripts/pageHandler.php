@@ -35,7 +35,7 @@ return $page_ID;
 function removePage($data){
     global $conn;
     $sql=
-    "DELETE FROM pages WHERE page_ID = ".$data["pageID"].";";
+    "DELETE FROM pages WHERE page_ID = ".$data["pageID"]." AND secure=0;";
     $conn->query($sql);
 }
 ?>

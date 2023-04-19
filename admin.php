@@ -93,10 +93,9 @@ include "basicFunctions.php";
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <form method="POST" class="modal-body">
-                                <input type="hidden" name="addPage" value="1">
-                                <input type="text" name="pageName" id="">
+                                <input type="text" name="pageName" id="" required>
                                 <input type="hidden" name="mainSite" value="<?php echo $site_ID;?>">
-                                <button type="submit">submit</button>
+                                <button type="submit" name="addPage" value="1">submit</button>
                             </form>
                         </div>
                     </div>
@@ -114,7 +113,7 @@ include "basicFunctions.php";
                             <form method="POST" class="modal-body">
                                 <input type="hidden" name="removePage" value="1">
                                 <select name="pageID" class="form-select" id="floatingSelect"
-                                    aria-label="Floating label select example">
+                                    aria-label="Floating label select example" required>
                                     <?php
                                     $sql = "SELECT * FROM pages WHERE site_ID = ".$site_ID.' AND secure=0';
                                     $result = $conn->query($sql);
@@ -150,8 +149,12 @@ include "basicFunctions.php";
         }
         ?>
         <form action="phpScripts/createSite.php" method="POST">
+        
         <label for="siteName">Name your site
             <input type="text" name="siteName" id="siteName" required>
+        </label>
+        <label for="siteName">Name of your mainpage
+            <input type="text" name="pageName" id="pageName" required>
         </label>
         <button type="submit">Create new page</button>
         <p>This will only work when selecting name, that doesnt exist</p>
