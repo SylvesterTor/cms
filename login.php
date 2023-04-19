@@ -2,7 +2,7 @@
 
 $logInError=false;
 $loggedIn=false;
-
+$error = 0;
 session_start();
 
 //check if user is logged in
@@ -20,31 +20,61 @@ include "phpScripts/navbar.php";
 include "basicFunctions.php";
 
 
-if(isset($_POST["username"])){
-    $logInError=true;
-    $username=$_POST["username"];
-    $logIn->execute();
-    $result=$logIn->get_result();
-    if($result->num_rows>0){
-        $row=$result->fetch_assoc();
-        if($row["password"]==$_POST["password"]){
-            session_start();
-            $siteId=$row["site_ID"];
-            $loggedIn=true;
-            $_SESSION["loggedIn"]=true;
-            $_SESSION["username"]=$username;
-            $_SESSION["user_ID"]=$row["user_ID"];
+if($_SERVER["REQUEST_METHOD"]=="POST" && isset($_POST["signup"])){
+    if(isset($_POST["email"]) && isset($_POST["password"])){
+        $email=strtolower($_POST["email"]);
+        $password=$_POST["password"];
+
+        $taken = false;
+        $sql = "SELECT * FROM `admin` WHERE `mail` = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if($result->num_rows == 0){
+            $sql="INSERT INTO `admin` (`mail`, `password`) VALUES ('$email', '$password')";
+            
+            $query=mysqli_query($conn,$sql);
+            $error=3;
+        } else {
+            $error=2;
+        }
     }
-}else {
-    $loggedIn=false;
-    $logInError=true;
-}
 }
 
-    
 
+
+
+if($_SERVER["REQUEST_METHOD"]=="POST" && isset($_POST["login"])){
+    if(isset($_POST["email"]) && isset($_POST["password"])){
+        $email=strtolower($_POST["email"]);
+        $password=$_POST["password"];
+        $sql="SELECT * FROM `admin` WHERE `mail` = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $loggedIn = false;
+        $logInError = true;
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                if ($password == $row['password']) {
+                    session_start();
+                    $loggedIn=true;
+                    $logInError = false;
+                    $_SESSION["loggedIn"]=true;
+                    $_SESSION["username"]=$username;
+                    $_SESSION["user_ID"]=$row["user_ID"];
+                }
+            }
+        }
+        if(!$loggedIn){
+            $error=1;
+        }
+    }
+}
     if(!$loggedIn){
-
 ?>
 
 <!DOCTYPE html>
@@ -65,13 +95,22 @@ if(isset($_POST["username"])){
             class="m-auto col-4 p-3 shadow border border-<?php echo ($logInError)?"danger":"green";?> border-1 rounded"
             method="POST">
             <h1>login to edit your page</h1>
-            <?php echo ($logInError)?"<p>please try again, username or password dont match up</p>":"";?>
-            <label for="username">Username</label>
-            <input class="form-control" type="text" id="username" name="username" id="">
+            <?php 
+            if ($error==1) {
+                echo("The email and password dont match.");
+            } elseif ($error==2) {
+                echo("The email is already in use.");
+            } elseif ($error==3) {
+                echo("Sucessfull creation. Profile is now active.");
+            }
+            ?>
+            <br>
+            <label for="email">Email</label>
+            <input class="form-control" type="email" id="username" name="email" id="" required>
             <label for="password" >Password</label>
-            <input id="password"  class="form-control" type="password" name="password" id="">
-            <button type="submit" class="mt-3 col-4 submit btn btn-outline-grey">Log in</button>
-            <a class="mt-3 col-4 submit btn btn-outline-grey" href="signup.php">Sign up</a>
+            <input id="password"  class="form-control" type="password" name="password" id="" required>
+            <button type="submit" name="login" class="mt-3 col-4 submit btn btn-outline-grey">Log in</button>
+            <button type="submit" name="signup" class="mt-3 col-4 submit btn btn-outline-grey" href="signup.php">Sign up</a>
 
         </form>
     </div>
