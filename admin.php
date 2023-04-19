@@ -38,26 +38,46 @@ include "basicFunctions.php";
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/style.css">
-    <title>Document</title>
+    <title>Admin</title>
 </head>
 
 <body>
-    
+
     <main class="row">
         <a href="logout.php" class="text-end">log out</a>
         <h1 class="col-12 text-center">This is your admin page</h1>
     </main>
 
     <div class="container-fluid">
-        <div class="row">
+        <h3>Create new site</h3>
         <?php
-        $getSites = 
-        'SELECT * FROM adminpairing 
-        INNER JOIN `admin` ON `admin`.user_ID=adminpairing.user_ID
-        INNER JOIN `site` ON `site`.site_ID=adminpairing.site_ID
-        WHERE `admin`.user_ID = '.$_SESSION["user_ID"];
-        $sites=$conn->query($getSites);
-        $_SESSION["sites"]=(array) null;
+        if(isset($_GET["exists"])){
+            if($_GET["exists"]==1){
+                echo '<p class="text-danger">Pagename is already taken</p>';
+            }
+        }
+        ?>
+        <form action="phpScripts/createSite.php" class="col-4 m-4" method="POST">
+
+            <label for="siteName">Name your site
+                <input type="text" name="siteName" id="siteName" class="form-control" required>
+            </label>
+            <label for="siteName">Name of your mainpage
+                <input type="text" name="pageName" id="pageName" class="form-control" required>
+            </label>
+            <button type="submit" class="btn btn-secondary">Create new page</button>
+            <p>This will only work when selecting name, that doesnt exist</p>
+        </form>
+        <hr>
+        <div class="row">
+            <?php
+            $getSites = 
+             'SELECT * FROM adminpairing 
+             INNER JOIN `admin` ON `admin`.user_ID=adminpairing.user_ID
+             INNER JOIN `site` ON `site`.site_ID=adminpairing.site_ID
+             WHERE `admin`.user_ID = '.$_SESSION["user_ID"];
+             $sites=$conn->query($getSites);
+             $_SESSION["sites"]=(array) null;
 
         if($sites->num_rows>0){
             while($row=$sites->fetch_assoc()){
@@ -67,9 +87,9 @@ include "basicFunctions.php";
                 $pages=$get_pages->get_result();
                 
                 ?>
-                <div class="row col-4 p-4 m-auto shadow border ms-2">
-                    <h2 class="text-center"><?php echo $row["webaddress"];?></h2>
-                    <?php	
+            <div class="row col-4 p-4 m-auto shadow border ms-2">
+                <h2 class="text-center"><?php echo $row["webaddress"];?></h2>
+                <?php	
             if($pages->num_rows>0){
                 while($page=$pages->fetch_assoc()){
                     echo '<div class="col-5 m-2">';
@@ -82,39 +102,41 @@ include "basicFunctions.php";
                 echo "no pages";
             }
             ?>
-            <div class="mt-4 row col-12 m-0 p-0">
-                <!-- Button trigger modal -->
-                <button type="button" class="m-auto col-6 btn btn-green" data-bs-toggle="modal" data-bs-target="#addPageToSite<?php echo $site_ID;?>">
-                    Add page
-                </button>
+                <div class="mt-4 row col-12 m-0 p-0">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="m-auto col-6 btn btn-green" data-bs-toggle="modal"
+                        data-bs-target="#addPageToSite<?php echo $site_ID;?>">
+                        Add page
+                    </button>
 
-                <!-- Modal -->
-                <div class="modal fade" id="addPageToSite<?php echo $site_ID;?>" tabindex="-1" aria-labelledby="addPageLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form method="POST" class="modal-body">
-                                <input type="text" name="pageName" id="" required>
-                                <input type="hidden" name="mainSite" value="<?php echo $site_ID;?>">
-                                <button type="submit" name="addPage" value="1">submit</button>
-                            </form>
+                    <!-- Modal -->
+                    <div class="modal fade" id="addPageToSite<?php echo $site_ID;?>" tabindex="-1"
+                        aria-labelledby="addPageLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" class="modal-body">
+                                    <input type="text" name="pageName" id="" required>
+                                    <input type="hidden" name="mainSite" value="<?php echo $site_ID;?>">
+                                    <button type="submit" name="addPage" value="1">submit</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-        <!-- Button trigger modal -->
-        <button type="button" class="m-auto col-6 btn btn-red" data-bs-toggle="modal"
-                    data-bs-target="#removePage<?php echo $site_ID;?>">
-                    remove Page
-                </button>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="m-auto col-6 btn btn-red" data-bs-toggle="modal"
+                        data-bs-target="#removePage<?php echo $site_ID;?>">
+                        remove Page
+                    </button>
 
-        <div class="modal fade" id="removePage<?php echo $site_ID;?>" tabindex="-1" aria-labelledby="removePageLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form method="POST" class="modal-body">
-                                <input type="hidden" name="removePage" value="1">
-                                <select name="pageID" class="form-select" id="floatingSelect"
-                                    aria-label="Floating label select example" required>
-                                    <?php
+                    <div class="modal fade" id="removePage<?php echo $site_ID;?>" tabindex="-1"
+                        aria-labelledby="removePageLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" class="modal-body">
+                                    <input type="hidden" name="removePage" value="1">
+                                    <select name="pageID" class="form-select" id="floatingSelect"
+                                        aria-label="Floating label select example" required>
+                                        <?php
                                     $sql = "SELECT * FROM pages WHERE site_ID = ".$site_ID.' AND secure=0';
                                     $result = $conn->query($sql);
                                     if ($result->num_rows > 0) {
@@ -124,41 +146,23 @@ include "basicFunctions.php";
                                       }
                                     }
                                     ?>
-                                </select>
-                                <button type="submit">submit</button>
-                            </form>
+                                    </select>
+                                    <button type="submit">submit</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-                </div>
-                </div>
+            </div>
 
-        <?php
+            <?php
         }
     }else{
         echo '<h4>You currently have no sites to your name</h4>';
     }
         ?>
         </div>
-        <h3>create new site</h3>
-        <?php
-        if(isset($_GET["exists"])){
-            if($_GET["exists"]==1){
-                echo '<p class="text-danger">Pagename is already taken</p>';
-            }
-        }
-        ?>
-        <form action="phpScripts/createSite.php" method="POST">
-        
-        <label for="siteName">Name your site
-            <input type="text" name="siteName" id="siteName" required>
-        </label>
-        <label for="siteName">Name of your mainpage
-            <input type="text" name="pageName" id="pageName" required>
-        </label>
-        <button type="submit">Create new page</button>
-        <p>This will only work when selecting name, that doesnt exist</p>
-        </form>
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"
