@@ -11,7 +11,7 @@ if(isset($_SESSION["loggedIn"]) && $_SESSION["loggedIn"]){
 }else{
     $loggedIn=false;
 }
-#include "secrets/connectLocal.php";
+
 //include all the stuff
 include "secrets/connect.php";
 
@@ -29,7 +29,6 @@ if(isset($_POST["username"])){
         $row=$result->fetch_assoc();
         if($row["password"]==$_POST["password"]){
             session_start();
-            $siteId=$row["site_ID"];
             $loggedIn=true;
             $_SESSION["loggedIn"]=true;
             $_SESSION["username"]=$username;
