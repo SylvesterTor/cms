@@ -1,0 +1,26 @@
+@startuml  database for cms
+!define primary_key(x) <u>**PK**: X</u>
+hide methods
+hide stereotypes
+
+entity content{
+    id: int Pk
+    type: int Fk
+    zone: int
+}
+
+entity types{
+    id: int pk
+    type: int Fk
+}
+
+entity header{
+    size: int 
+    text: String
+}
+
+content||--||types
+
+
+
+@enduml
